@@ -1,4 +1,4 @@
-local DefaultPort = 23
+local DefaultPort = 5000
 local DefaultTimeout = 5
 local DefaultPollInterval = 15
 local DefaultFastPollInterval = 5
