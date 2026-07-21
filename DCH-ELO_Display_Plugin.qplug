@@ -6,7 +6,7 @@
 PluginInfo = {
   Name = "DCH~ELO~Elo IDS Monitor",
   Version = "0.0",
-  BuildVersion = "1.0.0.1",
+  BuildVersion = "1.0.2.0",
   Id = "55cb53bb-7043-4097-bfb1-d7fb12e66d00",
   Author = "DCH",
   Description = "Elo IDS monitor MDC control plugin"
@@ -14,7 +14,7 @@ PluginInfo = {
 
 -- Define the color of the plugin object in the design
 function GetColor(props)
-  return { 102, 102, 102 }
+  return { 45, 150, 211 }
 end
 
 -- The name that will initially display when dragged into a design
@@ -47,7 +47,7 @@ end
 function GetProperties()
   local props = {}
 table.insert(props, {Name = "IP Address", Type = "string", Value = ""})
-table.insert(props, {Name = "TCP Port", Type = "integer", Min = 1, Max = 65535, Value = 23})
+table.insert(props, {Name = "TCP Port", Type = "integer", Min = 1, Max = 65535, Value = 5000})
 table.insert(props, {Name = "Poll Interval", Type = "integer", Min = 1, Max = 300, Value = 15})
 table.insert(props, {Name = "Fast Poll Interval", Type = "integer", Min = 1, Max = 300, Value = 5})
 table.insert(props, {Name = "Response Timeout", Type = "integer", Min = 1, Max = 60, Value = 5})
@@ -2489,21 +2489,21 @@ local function AddLevelColumn(levelName, upName, downName, x)
 end
 
 local function AddPictureControls()
-  AddText("BRIGHTNESS", 54, 552, 96, 14, 8)
-  AddText("CONTRAST", 162, 552, 96, 14, 8)
-  layout["Brightness"] = {PrettyName = "Brightness", Style = "Fader", Position = {84,572}, Size = {36,82}, FontSize = 8}
-  layout["Contrast"] = {PrettyName = "Contrast", Style = "Fader", Position = {192,572}, Size = {36,82}, FontSize = 8}
-  AddTextControl("BrightnessFeedback", 54, 656, 96, 20, "Textdisplay")
-  AddTextControl("ContrastFeedback", 162, 656, 96, 20, "Textdisplay")
-  AddButton("AutoAdjust", 302, 562, 80, 28, "Auto", ButtonGray)
-  AddButton("RecallDefaults", 390, 562, 80, 28, "Defaults", Red)
+  AddText("BRIGHTNESS", 54, 544, 96, 14, 8)
+  AddText("CONTRAST", 162, 544, 96, 14, 8)
+  layout["Brightness"] = {PrettyName = "Brightness", Style = "Fader", Position = {84,564}, Size = {36,78}, FontSize = 8}
+  layout["Contrast"] = {PrettyName = "Contrast", Style = "Fader", Position = {192,564}, Size = {36,78}, FontSize = 8}
+  AddTextControl("BrightnessFeedback", 54, 648, 96, 20, "Textdisplay")
+  AddTextControl("ContrastFeedback", 162, 648, 96, 20, "Textdisplay")
+  AddButton("AutoAdjust", 302, 554, 80, 28, "Auto", ButtonGray)
+  AddButton("RecallDefaults", 390, 554, 80, 28, "Defaults", Red)
 end
 
 local function AddControlPage()
   AddHeader()
   AddGroupBox("POWER", 44, 160, 224, 134)
   AddGroupBox("INPUTS", 44, 306, 224, 154)
-  AddGroupBox("PICTURE", 44, 518, 438, 158)
+  AddGroupBox("PICTURE", 44, 518, 438, 164)
   AddGroupBox("VOLUME", 312, 160, 82, 328)
   AddPowerBlock()
   AddSourceButtons(54, 335)
@@ -2545,7 +2545,7 @@ end
 
 --Start event based logic
 if Controls then
-local DefaultPort = 23
+local DefaultPort = 5000
 local DefaultTimeout = 5
 local DefaultPollInterval = 15
 local DefaultFastPollInterval = 5
