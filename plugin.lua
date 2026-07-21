@@ -7,7 +7,7 @@
 
 -- Define the color of the plugin object in the design
 function GetColor(props)
-  return { 102, 102, 102 }
+  return { 45, 150, 211 }
 end
 
 -- The name that will initially display when dragged into a design
