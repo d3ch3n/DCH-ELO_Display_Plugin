@@ -6,7 +6,7 @@
 PluginInfo = {
   Name = "DCH~ELO~Elo IDS Monitor",
   Version = "0.0",
-  BuildVersion = "1.0.0.0",
+  BuildVersion = "1.0.0.1",
   Id = "55cb53bb-7043-4097-bfb1-d7fb12e66d00",
   Author = "DCH",
   Description = "Elo IDS monitor MDC control plugin"
@@ -23,7 +23,7 @@ function GetPrettyName(props)
 end
 
 -- Optional function used if plugin has multiple pages
-PageNames = { "Control" }  --List the pages within the plugin
+PageNames = { "Control", "Touch" }  --List the pages within the plugin
 function GetPages(props)
   local pages = {}
 for ix,name in ipairs(PageNames) do
@@ -2076,42 +2076,46 @@ local function AddPictureControls()
   AddButton("RecallDefaults", 390, 562, 80, 28, "Defaults", Red)
 end
 
-local function AddDiagnostics(y)
-  if PropIsYes("Enable Touch Control", true) then
-    AddButton("TouchEnabled", 302, y, 80, 28, "Touch", ButtonGray, "Toggle")
-    AddTextControl("TouchStatus", 390, y, 80, 28, "Textdisplay")
-    y = y + 40
-  end
-  if PropIsYes("Enable Diagnostics", true) then
-    AddButton("ReadStatus", 302, y, 80, 28, "Read", ButtonBlue)
-    AddTextControl("CommandStatus", 390, y, 80, 28, "Textdisplay")
-    AddText("TEMP", 302, y + 42, 80, 14, 8, "Left")
-    AddTextControl("Temperature", 390, y + 38, 80, 22, "Textdisplay")
-    AddText("POWER HRS", 302, y + 70, 80, 14, 8, "Left")
-    AddTextControl("PowerHours", 390, y + 66, 80, 22, "Textdisplay")
-    AddText("LIGHT HRS", 302, y + 98, 80, 14, 8, "Left")
-    AddTextControl("BacklightHours", 390, y + 94, 80, 22, "Textdisplay")
-  end
-end
-
 local function AddControlPage()
   AddHeader()
   AddGroupBox("POWER", 44, 160, 224, 134)
   AddGroupBox("INPUTS", 44, 306, 224, 154)
   AddGroupBox("PICTURE", 44, 518, 438, 158)
   AddGroupBox("VOLUME", 312, 160, 82, 328)
-  AddGroupBox("STATUS", 292, 306, 190, 182)
   AddPowerBlock()
   AddSourceButtons(54, 335)
   AddLevelColumn("Volume", "VolumeUp", "VolumeDown", 337)
   AddTextControl("VolumeFeedback", 326, 444, 64, 24, "Textdisplay")
   AddPictureControls()
-  AddDiagnostics(336)
+end
+
+local function AddTouchPage()
+  AddHeader()
+  AddGroupBox("TOUCH", 44, 160, 438, 110)
+  AddGroupBox("DIAGNOSTICS", 44, 292, 438, 194)
+  if PropIsYes("Enable Touch Control", true) then
+    AddButton("TouchEnabled", 74, 202, 120, 34, "Touch", ButtonGray, "Toggle")
+    AddText("TOUCH STATUS", 222, 197, 116, 14, 8, "Left")
+    AddTextControl("TouchStatus", 222, 215, 120, 24, "Textdisplay")
+  end
+  if PropIsYes("Enable Diagnostics", true) then
+    AddButton("ReadStatus", 74, 334, 120, 34, "Read Status", ButtonBlue)
+    AddText("COMMAND", 222, 329, 116, 14, 8, "Left")
+    AddTextControl("CommandStatus", 222, 347, 172, 24, "Textdisplay")
+    AddText("TEMPERATURE", 74, 394, 120, 14, 8, "Left")
+    AddTextControl("Temperature", 222, 390, 172, 24, "Textdisplay")
+    AddText("POWER HOURS", 74, 426, 120, 14, 8, "Left")
+    AddTextControl("PowerHours", 222, 422, 172, 24, "Textdisplay")
+    AddText("BACKLIGHT HOURS", 74, 458, 120, 14, 8, "Left")
+    AddTextControl("BacklightHours", 222, 454, 172, 24, "Textdisplay")
+  end
 end
 
 local CurrentPage = PageNames[props["page_index"].Value]
 if CurrentPage == "Control" then
   AddControlPage()
+elseif CurrentPage == "Touch" then
+  AddTouchPage()
 end
   return layout, graphics
 end
