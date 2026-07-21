@@ -150,21 +150,21 @@ local function AddLevelColumn(levelName, upName, downName, x)
 end
 
 local function AddPictureControls()
-  AddText("BRIGHTNESS", 54, 552, 96, 14, 8)
-  AddText("CONTRAST", 162, 552, 96, 14, 8)
-  layout["Brightness"] = {PrettyName = "Brightness", Style = "Fader", Position = {84,572}, Size = {36,82}, FontSize = 8}
-  layout["Contrast"] = {PrettyName = "Contrast", Style = "Fader", Position = {192,572}, Size = {36,82}, FontSize = 8}
-  AddTextControl("BrightnessFeedback", 54, 656, 96, 20, "Textdisplay")
-  AddTextControl("ContrastFeedback", 162, 656, 96, 20, "Textdisplay")
-  AddButton("AutoAdjust", 302, 562, 80, 28, "Auto", ButtonGray)
-  AddButton("RecallDefaults", 390, 562, 80, 28, "Defaults", Red)
+  AddText("BRIGHTNESS", 54, 544, 96, 14, 8)
+  AddText("CONTRAST", 162, 544, 96, 14, 8)
+  layout["Brightness"] = {PrettyName = "Brightness", Style = "Fader", Position = {84,564}, Size = {36,78}, FontSize = 8}
+  layout["Contrast"] = {PrettyName = "Contrast", Style = "Fader", Position = {192,564}, Size = {36,78}, FontSize = 8}
+  AddTextControl("BrightnessFeedback", 54, 648, 96, 20, "Textdisplay")
+  AddTextControl("ContrastFeedback", 162, 648, 96, 20, "Textdisplay")
+  AddButton("AutoAdjust", 302, 554, 80, 28, "Auto", ButtonGray)
+  AddButton("RecallDefaults", 390, 554, 80, 28, "Defaults", Red)
 end
 
 local function AddControlPage()
   AddHeader()
   AddGroupBox("POWER", 44, 160, 224, 134)
   AddGroupBox("INPUTS", 44, 306, 224, 154)
-  AddGroupBox("PICTURE", 44, 518, 438, 158)
+  AddGroupBox("PICTURE", 44, 518, 438, 164)
   AddGroupBox("VOLUME", 312, 160, 82, 328)
   AddPowerBlock()
   AddSourceButtons(54, 335)
