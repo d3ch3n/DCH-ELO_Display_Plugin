@@ -1,4 +1,1 @@
-table.insert(pins,{
-  Name = "Audio Output",
-  Direction = "output",
-})
+-- No unmanaged pins are required for the Elo IDS plugin.

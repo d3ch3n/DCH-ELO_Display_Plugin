@@ -1,1 +1,1 @@
-table.insert( wiring, { "Audio Output", "main_mixer Output 1" } )
+-- No internal wiring is required for the Elo IDS plugin.

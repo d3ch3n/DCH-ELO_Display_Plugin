@@ -12,11 +12,11 @@ end
 
 -- The name that will initially display when dragged into a design
 function GetPrettyName(props)
-  return "DCH Planar URP, version " .. PluginInfo.Version
+  return "DCH Elo IDS Monitor, version " .. PluginInfo.BuildVersion
 end
 
 -- Optional function used if plugin has multiple pages
-PageNames = { "Control", "Setup" }  --List the pages within the plugin
+PageNames = { "Control" }  --List the pages within the plugin
 function GetPages(props)
   local pages = {}
   --[[ #include "pages.lua" ]]
