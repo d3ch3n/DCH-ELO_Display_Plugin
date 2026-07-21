@@ -27,7 +27,7 @@ local function AddHeader()
   })
   table.insert(graphics,{
     Type = "Text",
-    Text = "Planar UltraRes",
+    Text = "DCH Planar URP",
     Color = Black,
     HTextAlign = "Center",
     Position = {110,17},
