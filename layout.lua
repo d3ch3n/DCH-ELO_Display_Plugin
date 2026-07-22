@@ -123,7 +123,11 @@ local function AddPowerBlock()
     Size = {100,66},
     FontSize = 10
   }
-  AddTextControl("PowerStatus", 54, 262, 204, 20, "Textdisplay")
+  AddTextControl("PowerStatus", 54, 262, 124, 20, "Textdisplay")
+  AddText("ON", 184, 262, 22, 16, 8, "Left")
+  AddLed("PowerIsOn", 208, 262, Green)
+  AddText("OFF", 228, 262, 24, 16, 8, "Left")
+  AddLed("PowerIsOff", 252, 262, Red)
 end
 
 local function AddSourceButtons(x, y)
