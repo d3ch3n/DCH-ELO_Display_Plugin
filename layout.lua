@@ -199,9 +199,31 @@ local function AddTouchPage()
   end
 end
 
+local function AddIdentityPage()
+  AddHeader()
+  AddGroupBox("PRODUCT IDENTITY", 44, 160, 438, 232)
+  AddButton("ReadIdentity", 74, 202, 120, 34, "Read Identity", ButtonBlue)
+  AddText("STATUS", 222, 197, 116, 14, 8, "Left")
+  AddTextControl("IdentityStatus", 222, 215, 190, 24, "Textdisplay")
+  AddText("MODEL", 74, 268, 120, 14, 8, "Left")
+  AddTextControl("IdentityModel", 222, 264, 190, 24, "Textdisplay")
+  AddText("SERIAL NUMBER", 74, 300, 120, 14, 8, "Left")
+  AddTextControl("IdentitySerial", 222, 296, 190, 24, "Textdisplay")
+
+  AddGroupBox("VERSIONS / NETWORK", 44, 416, 438, 162)
+  AddText("SYSTEM FW", 74, 458, 120, 14, 8, "Left")
+  AddTextControl("IdentitySystemVersion", 222, 454, 190, 24, "Textdisplay")
+  AddText("LAN FW", 74, 490, 120, 14, 8, "Left")
+  AddTextControl("IdentityLanVersion", 222, 486, 190, 24, "Textdisplay")
+  AddText("MAC ADDRESS", 74, 522, 120, 14, 8, "Left")
+  AddTextControl("IdentityMacAddress", 222, 518, 190, 24, "Textdisplay")
+end
+
 local CurrentPage = PageNames[props["page_index"].Value]
 if CurrentPage == "Control" then
   AddControlPage()
 elseif CurrentPage == "Touch" then
   AddTouchPage()
+elseif CurrentPage == "Identity" then
+  AddIdentityPage()
 end

@@ -70,3 +70,11 @@ if PropIsYes("Enable Diagnostics", true) then
   AddControl({Name = "BacklightHours", ControlType = "Text", Count = 1, IsReadOnly = true})
   AddControl({Name = "CommandStatus", ControlType = "Text", Count = 1, IsReadOnly = true})
 end
+
+AddControl({Name = "ReadIdentity", ControlType = "Button", ButtonType = "Trigger", Count = 1, UserPin = true, PinStyle = "Input"})
+AddControl({Name = "IdentityModel", ControlType = "Text", Count = 1, IsReadOnly = true})
+AddControl({Name = "IdentitySerial", ControlType = "Text", Count = 1, IsReadOnly = true})
+AddControl({Name = "IdentitySystemVersion", ControlType = "Text", Count = 1, IsReadOnly = true})
+AddControl({Name = "IdentityLanVersion", ControlType = "Text", Count = 1, IsReadOnly = true})
+AddControl({Name = "IdentityMacAddress", ControlType = "Text", Count = 1, IsReadOnly = true})
+AddControl({Name = "IdentityStatus", ControlType = "Text", Count = 1, IsReadOnly = true})

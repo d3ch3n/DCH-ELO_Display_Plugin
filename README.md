@@ -10,11 +10,14 @@ Plugin Q-SYS para controle de monitores Elo IDS via protocolo MDC.
 - Brilho e contraste
 - Touch on/off
 - Leitura de temperatura interna e horas de uso
+- Página de identidade com modelo, número de série, versões e MAC
 - Auto-adjust e recall defaults
 
 ## Conexão
 
 O plugin envia frames MDC binários por TCP. Configure `IP Address` e `TCP Port` nas propriedades ou nos controles do plugin. Para o Elo IDS-4304L PCAP AF testado em rede, a porta MDC over TCP/IP aberta é `5000`.
+
+A página `Identity` também consulta `http://<IP>/page0.asp` na porta `80` para ler o `Device Model`, pois esse campo é exposto pela interface web do IDS04. O número de série e dados auxiliares também são lidos via MDC quando disponíveis.
 
 Para monitores Elo IDS 03/53 por serial/USB virtual, a documentação da Elo informa MDC em `9600/8-N-1`. Para IDS 04/54 por TCP/IP, confirme que o firmware e as opções de MDC over TCP/IP estão habilitados no monitor. Em alguns modelos, Energy Saving Mode deve ficar desabilitado para comandos MDC funcionarem corretamente.
 

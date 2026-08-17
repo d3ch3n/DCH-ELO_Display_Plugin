@@ -1,4 +1,5 @@
 local DefaultPort = 5000
+local IdentityHttpPort = 80
 local DefaultTimeout = 5
 local DefaultPollInterval = 15
 local DefaultFastPollInterval = 5
@@ -22,7 +23,11 @@ local Commands = {
   Volume = 0x62,
   Temperature = 0xB1,
   Lifetime = 0xC0,
+  SystemVersion = 0xC9,
   Touch = 0xC7,
+  SerialNumber = 0xE2,
+  MacAddress = 0xDE,
+  LanVersion = 0xFD,
   Power = 0xD6
 }
 
@@ -43,7 +48,10 @@ for name, value in pairs(SourceValues) do
 end
 
 local socket = nil
+local identitySocket = nil
+local identityHttpBuffer = ""
 local timeoutTimer = Timer.New()
+local identityHttpTimer = Timer.New()
 local pollTimer = Timer.New()
 local fastPollTimer = Timer.New()
 local retryTimer = Timer.New()
@@ -278,6 +286,79 @@ local function WordAt(data, index)
   return high * 256 + low
 end
 
+local function PayloadToText(data)
+  local chars = {}
+  for i = 1, #data do
+    local byte = string.byte(data, i)
+    if byte ~= nil and byte >= 32 and byte <= 126 then
+      table.insert(chars, string.char(byte))
+    end
+  end
+  return table.concat(chars)
+end
+
+local function PayloadToMac(data)
+  local parts = {}
+  for i = 1, #data do
+    table.insert(parts, string.format("%02X", string.byte(data, i) or 0))
+  end
+  return table.concat(parts, ":")
+end
+
+local function SetIdentityStatus(text)
+  SetControlString("IdentityStatus", text)
+end
+
+local function HtmlDecode(text)
+  text = tostring(text or "")
+  text = string.gsub(text, "&nbsp;", " ")
+  text = string.gsub(text, "&amp;", "&")
+  text = string.gsub(text, "&lt;", "<")
+  text = string.gsub(text, "&gt;", ">")
+  text = string.gsub(text, "&quot;", "\"")
+  return text
+end
+
+local function CleanHtmlValue(value)
+  value = tostring(value or "")
+  value = string.gsub(value, "<[^>]->", "")
+  value = string.gsub(value, "^%s+", "")
+  value = string.gsub(value, "%s+$", "")
+  return HtmlDecode(value)
+end
+
+local function ExtractInfoValue(html, label)
+  local labelPos = string.find(html or "", label, 1, true)
+  if labelPos == nil then
+    return nil
+  end
+  local value = string.match(string.sub(html, labelPos), "<p>(.-)</p>")
+  if value == nil then
+    return nil
+  end
+  value = CleanHtmlValue(value)
+  if value == "" then
+    return nil
+  end
+  return value
+end
+
+local function ApplyIdentityHtml(html)
+  local model = ExtractInfoValue(html, "Device Model")
+  local serial = ExtractInfoValue(html, "Software Serial Number")
+  if model ~= nil then
+    SetControlString("IdentityModel", model)
+  end
+  if serial ~= nil then
+    SetControlString("IdentitySerial", serial)
+  end
+  if model ~= nil or serial ~= nil then
+    SetIdentityStatus("OK")
+  else
+    SetIdentityStatus("Identity unavailable")
+  end
+end
+
 local function HandleReadResponse(command, data)
   if command == Commands.Power then
     UpdatePower(string.byte(data, 2) or string.byte(data, 1))
@@ -309,6 +390,14 @@ local function HandleReadResponse(command, data)
     SetControlString("BacklightHours", tostring(WordAt(data, 3)))
   elseif command == Commands.Touch then
     UpdateTouch(string.byte(data, 2) or string.byte(data, 1))
+  elseif command == Commands.SerialNumber then
+    SetControlString("IdentitySerial", PayloadToText(data))
+  elseif command == Commands.SystemVersion then
+    SetControlString("IdentitySystemVersion", PayloadToText(data))
+  elseif command == Commands.LanVersion then
+    SetControlString("IdentityLanVersion", PayloadToText(data))
+  elseif command == Commands.MacAddress then
+    SetControlString("IdentityMacAddress", PayloadToMac(data))
   end
 end
 
@@ -473,6 +562,62 @@ local function FastPoll()
   fastPollTimer:Stop()
 end
 
+local function ReadIdentity()
+  SetIdentityStatus("Reading")
+  SetControlString("IdentityModel", "")
+  SetControlString("IdentitySerial", "")
+  SetControlString("IdentitySystemVersion", "")
+  SetControlString("IdentityLanVersion", "")
+  SetControlString("IdentityMacAddress", "")
+
+  local ip = IPAddress()
+  if ip == "" then
+    SetIdentityStatus("Missing IP Address")
+    return
+  end
+
+  AddRead(Commands.SerialNumber, true)
+  AddRead(Commands.SystemVersion, true)
+  AddRead(Commands.LanVersion, true)
+  AddRead(Commands.MacAddress, true)
+
+  identityHttpBuffer = ""
+  identityHttpTimer:Stop()
+  if identitySocket ~= nil then
+    identitySocket:Disconnect()
+    identitySocket = nil
+  end
+  identitySocket = TcpSocket.New()
+  identitySocket.EventHandler = function(sock, event, err)
+    if event == TcpSocket.Events.Connected then
+      local request = "GET /page0.asp HTTP/1.0\r\nHost: " .. IPAddress() .. "\r\nConnection: close\r\n\r\n"
+      sock:Write(request)
+      identityHttpTimer:Start(ResponseTimeout())
+    elseif event == TcpSocket.Events.Data then
+      identityHttpBuffer = identityHttpBuffer .. sock:Read(sock.BufferLength)
+    elseif event == TcpSocket.Events.Closed then
+      identityHttpTimer:Stop()
+      ApplyIdentityHtml(identityHttpBuffer)
+    elseif event == TcpSocket.Events.Error or event == TcpSocket.Events.Timeout then
+      identityHttpTimer:Stop()
+      SetIdentityStatus(err or "HTTP identity error")
+    end
+  end
+  identitySocket:Connect(ip, IdentityHttpPort)
+end
+
+identityHttpTimer.EventHandler = function()
+  identityHttpTimer:Stop()
+  if identitySocket ~= nil then
+    identitySocket:Disconnect()
+  end
+  if identityHttpBuffer ~= "" then
+    ApplyIdentityHtml(identityHttpBuffer)
+  else
+    SetIdentityStatus("HTTP identity timeout")
+  end
+end
+
 local function CompleteCurrent(frame)
   local parsed = ParseFrame(frame)
   if parsed == nil then
@@ -564,6 +709,12 @@ local function InitializeControls()
   SetControlString("VolumeFeedback", "")
   SetControlString("BrightnessFeedback", "")
   SetControlString("ContrastFeedback", "")
+  SetControlString("IdentityModel", "")
+  SetControlString("IdentitySerial", "")
+  SetControlString("IdentitySystemVersion", "")
+  SetControlString("IdentityLanVersion", "")
+  SetControlString("IdentityMacAddress", "")
+  SetIdentityStatus("")
   SetConnected(false)
   SetStatus(Status.Initializing, "Initializing")
   OpenSocket()
@@ -695,6 +846,12 @@ end
 if HasControl("ReadStatus") then
   Control("ReadStatus").EventHandler = function()
     Poll()
+  end
+end
+
+if HasControl("ReadIdentity") then
+  Control("ReadIdentity").EventHandler = function()
+    ReadIdentity()
   end
 end
 
